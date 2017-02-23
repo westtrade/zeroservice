@@ -1,0 +1,12 @@
+{
+  "name": "zeroservice",
+  "version": "1.0.0",
+  "description": "Zero service is prototype of states services",
+  "main": "./src/ZeroService.js",
+  "repository": {
+    "url": "westtrade/zeroservice",
+    "type": "git"
+  },
+  "author": "Popov Gennadiy <me@westtrade.tk>",
+  "license": "MIT"
+}
