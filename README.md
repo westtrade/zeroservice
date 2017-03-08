@@ -1,19 +1,26 @@
-# zeroservice
+# ZeroService
 Zero service is prototype of states services
-
-
 
 # ROADMAP
 
--[] Split into eextendable services
+- [ ] Split into extendable services
+- [ ] Service collaboration
 
 ```
 
 class AuthService extends ZeroService {
 
-login(){}
-logout(){}
+	constructor() {
+		super()
+	}
 
+	login(){
+
+	}
+
+	logout(){
+
+	}
 }
 
 

@@ -1,6 +1,5 @@
 import {safeApply} from './utils'
-    
-import ZeroService from './ZeroService'
+import ZeroService from '..d/ZeroService'
 
 export default class ZeroServiceAngular extends ZeroService {
 
@@ -9,18 +8,18 @@ export default class ZeroServiceAngular extends ZeroService {
 	}
 
 	broadcast(data = {}) {
-		
+
 		this[properties].watchers.forEach(([$scope, propertyName]) => {
 			safeApply($scope, () => {
-				$scope[propertyName] = this.getState();
-			});
-		});
-		
+				$scope[propertyName] = this.getState()
+			})
+		})
+
 	}
 
 	bind($scope, propertyName) {
 
-		let watcher = [$scope, propertyName];
+		let watcher = [$scope, propertyName]
 
 		this[properties].watchers.add(watcher)
 
