@@ -1,10 +1,10 @@
 'use strict';
 
-import {Writable} from 'stream'
+import {Duplex} from 'stream'
 
 const properties = Symbol('private properties')
 
-export default class ZeroService extends Writable{
+export default class ZeroService extends Duplex {
 
 	constructor() {
 
@@ -17,12 +17,16 @@ export default class ZeroService extends Writable{
 		this[properties] = {
 			watchers,
 			state: {},
-			exposed: []
+			exposed: [],
 		}
 	}
 
 	_write(chunk, encoding, done = () => {}) {
 		done();
+	}
+
+	_broadcast(data = {}) {
+		this[properties].watchers.forEach((watcher) => watcher(data))
 	}
 
 	get exposed() {
@@ -35,15 +39,7 @@ export default class ZeroService extends Writable{
 			value = [value]
 		}
 
-		value = value.filter((item) => {
-			return item;
-		})
-
-		this[properties]['exposed'] = value;
-	}
-
-	broadcast(data = {}) {
-		this[properties].watchers.forEach((watcher) => watcher(data))
+		this[properties]['exposed'] = value.filter(onlyExisting)
 	}
 
 	bind(watcher) {
@@ -70,7 +66,7 @@ export default class ZeroService extends Writable{
 		}
 
 		if (!preventBroadcast) {
-			this.broadcast('update', this[properties].state)
+			this._broadcast('update', this[properties].state)
 			this.write(this.getState())
 		}
 	}
@@ -98,5 +94,3 @@ export default class ZeroService extends Writable{
 		return newState;
 	}
 }
-
-

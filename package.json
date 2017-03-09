@@ -8,5 +8,29 @@
     "type": "git"
   },
   "author": "Popov Gennadiy <me@westtrade.tk>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "angular": "^1.6.3",
+    "ava": "^0.18.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.23.0",
+    "babel-register": "^6.23.0",
+    "jsdom": "^9.11.0",
+    "vue": "^2.2.1"
+  },
+  "ava": {
+    "require": [
+      "babel-register",
+	  "./test/helpers/setup-browser-env.js"
+
+    ]
+  },
+  "babel": {
+    "presets": [
+      "@ava/stage-4"
+    ]
+  },
+  "scripts": {
+    "test": "ava"
+  }
 }

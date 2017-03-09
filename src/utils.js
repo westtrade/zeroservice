@@ -9,4 +9,3 @@ export let safeApply =  ($scope, fn = () => {}) => {
 	let {$$phase} = $scope.$root;
 	$$phase == '$apply' || $$phase == '$digest' ? fn() : $scope.$apply(fn);
 }
-
