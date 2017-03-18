@@ -33,3 +33,7 @@ AuthService.setup(AngularAdapter);
 
 
 ```
+
+
+# TODO
+- [ ] Fix test coverage reporters (https://github.com/douglasduteil/isparta, https://github.com/karma-runner/karma-coverage, https://onsen.io/blog/mocha-chaijs-unit-test-coverage-es6/)
