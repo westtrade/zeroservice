@@ -42,7 +42,7 @@ module.exports = function karmaConfig(config) {
 			// 'karma-chai-as-promised',
 
 			'karma-phantomjs-launcher',
-            // 'karma-chrome-launcher',
+            'karma-chrome-launcher',
             // 'karma-firefox-launcher',
 			'karma-html-detailed-reporter',
 			'karma-coverage-istanbul-reporter',
@@ -154,7 +154,7 @@ module.exports = function karmaConfig(config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
 		browsers: [
-            // 'Chromium',
+			// 'Chromium',
 			'PhantomJS',
             // 'Firefox'
 		],

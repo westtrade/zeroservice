@@ -1,6 +1,6 @@
 {
   "name": "zeroservice",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Zero service is prototype of states services",
   "main": "./src/ZeroService.js",
   "repository": {
@@ -11,15 +11,20 @@
   "license": "MIT",
   "devDependencies": {
     "angular": "^1.6.3",
+    "angular-mocks": "^1.6.3",
     "babel-loader": "^6.4.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.23.0",
+    "babel-preset-airbnb": "^2.2.3",
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-stage-0": "^6.22.0",
     "babel-register": "^6.23.0",
     "babel-runtime": "^6.23.0",
     "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "cheerio": "^0.22.0",
+    "enzyme": "^2.7.1",
     "eslint": "^3.17.1",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-config-airbnb-base": "^11.1.1",
@@ -49,15 +54,17 @@
     "karma-sinon-chai": "^1.2.4",
     "karma-webpack": "^2.0.2",
     "mocha": "^3.2.0",
+    "react": "^15.4.2",
+    "react-addons-test-utils": "^15.4.2",
+    "react-dom": "^15.4.2",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0",
     "vue": "^2.2.1",
     "webpack": "^2.2.1"
   },
   "scripts": {
-    "test": "karma start"
+    "test": "karma start",
+	"test:watch": "karma start --watch"
   },
-  "dependencies": {
-    "chai-as-promised": "^6.0.0"
-  }
+  "dependencies": {}
 }

@@ -1,10 +1,25 @@
 # ZeroService
-Zero service is prototype of states services
+
+It is a framework-agnostic stateful reactive stream service prototype, which
+allow you to implement reusable application services, which can be integrated
+with diffrent ui frameworks and worked in evironments, such as Electron, web or
+cordova.
+
+# Supported frameworks
+
+- Angular (1.x)
+- Polymer
+- React
+- Riot
+- Vue
 
 # ROADMAP
 
-- [ ] Split into extendable services
 - [ ] Service collaboration
+- [ ] Implement adapter for Tabrisjs
+- [ ] Implement adapter for NativeScript
+- [ ] Reduce size
+- [ ] Improve perfomance
 
 ```
 

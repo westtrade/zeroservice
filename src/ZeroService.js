@@ -5,18 +5,30 @@ import ZeroAdapter from './ZeroAdapter';
 
 export const properties = Symbol('private properties');
 
-const clone = Symbol('clone method');
+export const clone = Symbol('clone method');
 const broadcast = Symbol('broadcast method');
 
+
+// TODO Prevent ovveride exposed by state and state by exposed,
+// with option strict and non-strict
+
 export class ZeroService extends Transform 	{
-	constructor({ objectMode = true, adapter = ZeroAdapter } = {}) {
+	/**
+	 * ZeroService constructor
+	 * @param {Object} settings - Settings of constructor
+	 * @param {Boolean} settings.objectMode -
+	 * @type {Boolean}
+	 */
+	constructor({ objectMode = true, adapter = ZeroAdapter, adapterSettings = {} } = {}) {
 		super({ objectMode });
 
 		this[properties] = {
+			initialState: {},
 			state: {},
 			exposed: new Set(),
 			adapter: null,
 			middlewares: [],
+			adapterSettings,
 		};
 
 		this.adapter = adapter;
@@ -29,6 +41,9 @@ export class ZeroService extends Transform 	{
 		done();
 	}
 
+	/**
+	 * Deep clone of object for variable with object type
+	 */
 	[clone](input) {
 		if (typeof input !== 'object') {
 			return input;
@@ -46,6 +61,11 @@ export class ZeroService extends Transform 	{
 		return out;
 	}
 
+	/**
+	 * Set service adapter
+	 * @param  {[type]} AdapterClass [description]
+	 * @return {[type]}              [description]
+	 */
 	set adapter(AdapterClass) {
 		const prevAdapter = this.adapter;
 
@@ -53,33 +73,48 @@ export class ZeroService extends Transform 	{
 			prevAdapter.destroy();
 		}
 
-		const adapter = new AdapterClass(this);
-		assert(adapter instanceof ZeroAdapter, 'Adapter must be instance of ZeroAdapter class');
-		// adapter
-
+		const adapter = new AdapterClass(this[properties].adapterSettings);
+		assert(adapter instanceof ZeroAdapter, 'Adapter must be instance of CallbackAdapter class');
 		this[properties].adapter = adapter;
 	}
 
+	/**
+	 * Current adapter for watchers
+	 * @return {CallbackAdapter}
+	 */
 	get adapter() {
 		const { adapter = null } = this[properties];
 		return adapter;
 	}
 
+	/**
+	 * List of service exposed properties
+	 * @return {Array}
+	 */
 	get exposed() {
 		return Array.from(this[properties].exposed);
 	}
 
+	/**
+	 * Set exposed names
+	 * @param  {(string|string[])}  [exposedNames=[]] List of exposed properties names
+	 */
 	set exposed(exposedNames = []) {
+		// assert(!this.exposed.length'Exposed attributes cannot be reassigned.')
+		// TODO maybe in this place we need a message about reassigned exposed properties
 		const exposedNamesList = Array.isArray(exposedNames)
 			? exposedNames
 			: [exposedNames];
 
 		exposedNamesList
-			.forEach(name => assert(typeof name === 'string', 'Exposed propertie name must be a string'));
+			.forEach(name => assert(typeof name === 'string', 'Exposed property name must be a string'));
 
 		this[properties].exposed = new Set(exposedNamesList);
 	}
 
+	/**
+	 * Method set service state
+	 */
 	async setState(...args) {
 		let	preventBroadcast = false;
 
@@ -88,7 +123,7 @@ export class ZeroService extends Transform 	{
 				preventBroadcast = args[1];
 			}
 
-			await args[0].call(this);
+			await args[0].call(this, this.state);
 		} else {
 			let name = null;
 			let data;
@@ -118,6 +153,30 @@ export class ZeroService extends Transform 	{
 		this.write(this.state);
 	}
 
+	/**
+	 * Setup initial state of service
+	 * @param  {*} stateData [description]
+	 */
+	set initialState(stateData) {
+		this[properties].initialState = stateData;
+		return this.setState(stateData, false);
+	}
+
+	get initialState() {
+		return this[properties].initialState;
+	}
+
+	async isReady() {
+		return true;
+	}
+
+	/**
+	 * Method return state of service
+	 *
+	 * @param {Boolean} cleanState - flag forcing method return clean state,
+	 * without exposed params
+	 * @type {*}
+	 */
 	getState(cleanState = false) {
 		const { state } = this[properties];
 		const newState = this[clone](state);
@@ -125,54 +184,96 @@ export class ZeroService extends Transform 	{
 		if (!cleanState) {
 			this.exposed.forEach((key) => {
 				const keyExists = key in this;
-				if (!keyExists) {
-					return;
+				let exposedValue;
+
+				if (!keyExists && key in this.constructor) {
+					exposedValue = this.constructor[key];
+				}
+
+				assert(keyExists || exposedValue,
+					`This class ${this.constructor.name} must have property or method with name ${key}`);
+
+				if (!exposedValue && keyExists) {
+					exposedValue = this[key];
 				}
 
 				// TODO Prevent linking between object assigned to class and state
-				if (typeof this[key] === 'function') {
-					newState[key] = this[key].bind(this);
-				} else {
-					newState[key] = this[key];
+				if (typeof exposedValue === 'function') {
+					exposedValue = exposedValue.bind(this);
 				}
+				newState[key] = exposedValue;
 			});
 		}
 
 		return newState;
 	}
 
+	/**
+	 * Clean service state, without exposed properties.
+	 * Result related private property of service state.
+	 * @return {*} state of service
+	 */
 	get state() {
 		const { state } = this[properties];
 		return state;
 	}
 
+	/**
+	 * State of service
+	 *
+	 * @param  {*} newState New state of service
+	 */
 	set state(newState) {
 		this.setState(newState);
 	}
 
+	/**
+	 * Method add stream middleware
+	 */
 	use(...middlewares) {
 		this[properties].middlewares =
 			this[properties].middlewares.concat(middlewares);
 	}
 
-	bind(...args) {
+	/**
+	 * Bind views state to service
+	 */
+	mount(watcher, propertyName) {
+		assert(watcher, 'Argument watcher must be defined');
+		assert(typeof propertyName === 'string', 'Argument `propertyName` must be a string');
 		const adapter = this.adapter;
+		const initialState = this.getState();
 		if (adapter) {
-			adapter.bind(...args);
+			adapter.mount(watcher, propertyName, initialState);
 		}
 	}
 
-	[broadcast](data = {}) {
+	// config() {
+	//
+	// }
+
+	/**
+	 * Broadcast is private method for broadcasting events to adapter about
+	 * state changing
+	 */
+	[broadcast](data = {}, callback = () => {}) {
 		const adapter = this.adapter;
 		if (adapter) {
-			adapter.broadcast(data);
+			adapter.broadcast(data, callback);
 		}
 	}
 
-	unbind(...args) {
+	/**
+	 * Remove change watcher
+	 */
+	unmount(watcher) {
 		const adapter = this.adapter;
 		if (adapter) {
-			adapter.unbind(...args);
+			adapter.unmount(watcher);
 		}
+	}
+
+	forceUpdate(callback = () => {}) {
+		this[broadcast](this.getState(), callback);
 	}
 }
