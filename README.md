@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/westtrade/zeroservice.svg?branch=master)](https://travis-ci.org/westtrade/zeroservice)
 [![Dependency Status](https://gemnasium.com/badges/github.com/westtrade/zeroservice.svg)](https://gemnasium.com/github.com/westtrade/zeroservice)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6c5b28e6096b4527b40ecef26061d784)](https://www.codacy.com/app/westtrade/zeroservice?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=westtrade/zeroservice&amp;utm_campaign=Badge_Grade)
+[![Stories in Ready](https://badge.waffle.io/westtrade/zeroservice.svg?label=ready&title=Ready)](http://waffle.io/westtrade/zeroservice)
 
 It is a framework-agnostic stateful reactive stream service prototype, which
 allow you to implement reusable application services, which can be integrated
